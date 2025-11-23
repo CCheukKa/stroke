@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import Database from 'better-sqlite3';
 import { StrokeEmptyable } from './Stroke';
 const G6_SQLITE_DB_PATH = './installation/installed files (custom)/g6.sqlite';
-const JSON_OUTPUT_PATH = './public/data/g6-tcf-entries.json';
+const JSON_OUTPUT_PATH = './public/g6-tcf-entries.json';
 
 /* -------------------------------------------------------------------------- */
 

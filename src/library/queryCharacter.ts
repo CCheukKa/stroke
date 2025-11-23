@@ -1,5 +1,5 @@
 import type { G6TCFEntry } from './jsoniseData';
-import json from './../../public/data/g6-tcf-entries.json';
+import json from './../../public/g6-tcf-entries.json';
 import { Stroke } from './Stroke';
 const G6Entries = json as G6TCFEntry[];
 

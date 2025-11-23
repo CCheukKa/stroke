@@ -42,4 +42,4 @@ yarn-error.log*
 # custom
 **/.vscode
 /next-env.d.ts
-/public/data
+/public/g6-tcf-entries.json
