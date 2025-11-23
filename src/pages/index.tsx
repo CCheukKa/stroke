@@ -1,7 +1,7 @@
 import styles from "@/styles/index.module.css";
 import { GetStaticProps } from "next";
 import { AppPageProps } from "./_app";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Stroke, StrokeWildcardable } from "@/library/Stroke";
 import { G6TCFEntry } from "@/library/jsoniseData";
 import { queryCharacters } from "@/library/queryCharacter";
@@ -112,7 +112,7 @@ export default function HomePage() {
                 switch (code) {
                     case Keybinds.TOGGLE_ENABLE: {
                         setState(State.TYPING);
-                        return { type: ActionType.CONSUME };
+                        return { type: ActionType.CLEAR };
                     }
                     default: {
                         return { type: ActionType.NOOP };
@@ -123,7 +123,7 @@ export default function HomePage() {
                 switch (code) {
                     case Keybinds.TOGGLE_ENABLE: {
                         setState(State.DISABLED);
-                        return { type: ActionType.CONSUME };
+                        return { type: ActionType.CLEAR };
                     }
                     case Keybinds.STORKE_POSITIVE_DIAGONAL: { return { type: ActionType.ADD, input: Stroke.POSITIVE_DIAGONAL }; }
                     case Keybinds.STORKE_NEGATIVE_DIAGONAL: { return { type: ActionType.ADD, input: Stroke.NEGATIVE_DIAGONAL }; }
@@ -153,7 +153,7 @@ export default function HomePage() {
                 switch (code) {
                     case Keybinds.TOGGLE_ENABLE: {
                         setState(State.DISABLED);
-                        return { type: ActionType.CONSUME };
+                        return { type: ActionType.CLEAR };
                     }
                     case Keybinds.CLEAR: {
                         setState(State.TYPING);
@@ -361,6 +361,13 @@ export default function HomePage() {
     /* -------------------------------------------------------------------------- */
 
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
+    useEffect(() => {
+        document.addEventListener("keydown", () => {
+            if (textAreaRef.current && document.activeElement !== textAreaRef.current) {
+                textAreaRef.current.focus();
+            }
+        });
+    }, []);
     return (
         <div className={styles.container}>
             <textarea
