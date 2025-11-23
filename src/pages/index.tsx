@@ -362,11 +362,27 @@ export default function HomePage() {
 
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
     useEffect(() => {
-        document.addEventListener("keydown", () => {
-            if (textAreaRef.current && document.activeElement !== textAreaRef.current) {
+        const handler = (e: KeyboardEvent) => {
+            if (textAreaRef.current && e.target !== textAreaRef.current) {
+                e.preventDefault();
                 textAreaRef.current.focus();
+                const keyboardEvent = new KeyboardEvent(e.type, {
+                    key: e.key,
+                    code: e.code,
+                    location: e.location,
+                    ctrlKey: e.ctrlKey,
+                    shiftKey: e.shiftKey,
+                    altKey: e.altKey,
+                    metaKey: e.metaKey,
+                    repeat: e.repeat,
+                    bubbles: true,
+                    cancelable: true,
+                });
+                textAreaRef.current.dispatchEvent(keyboardEvent);
             }
-        });
+        };
+        document.addEventListener("keydown", handler);
+        return () => document.removeEventListener("keydown", handler);
     }, []);
     return (
         <div className={styles.container}>
