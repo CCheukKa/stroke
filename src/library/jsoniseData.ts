@@ -1,10 +1,19 @@
 import fs from 'fs-extra';
 import Database from 'better-sqlite3';
-import { StrokeEmptyable } from './Stroke';
 const G6_SQLITE_DB_PATH = './installation/installed files (custom)/g6.sqlite';
 const JSON_OUTPUT_PATH = './public/g6-tcf-entries.json';
 
 /* -------------------------------------------------------------------------- */
+
+// FIXME: Import from Stroke.ts when module resolution issue is resolved (migrate to using bun for this script!)
+const enum StrokeEmptyable {
+    POSITIVE_DIAGONAL = "丿",
+    NEGATIVE_DIAGONAL = "丶",
+    VERTICAL = "丨",
+    HORIZONTAL = "一",
+    COMPOUND = "フ",
+    EMPTY = "",
+};
 
 type G6TCFEntryRaw = {
     _id: number;
