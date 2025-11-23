@@ -4,22 +4,10 @@ export const enum Stroke {
     VERTICAL = "丨",
     HORIZONTAL = "一",
     COMPOUND = "フ",
-};
-
-export const enum StrokeEmptyable {
-    POSITIVE_DIAGONAL = Stroke.POSITIVE_DIAGONAL,
-    NEGATIVE_DIAGONAL = Stroke.NEGATIVE_DIAGONAL,
-    VERTICAL = Stroke.VERTICAL,
-    HORIZONTAL = Stroke.HORIZONTAL,
-    COMPOUND = Stroke.COMPOUND,
     EMPTY = "",
+    WILDCARD = "＊",
 };
 
-export const enum StrokeWildcardable {
-    POSITIVE_DIAGONAL = Stroke.POSITIVE_DIAGONAL,
-    NEGATIVE_DIAGONAL = Stroke.NEGATIVE_DIAGONAL,
-    VERTICAL = Stroke.VERTICAL,
-    HORIZONTAL = Stroke.HORIZONTAL,
-    COMPOUND = Stroke.COMPOUND,
-    WILDCARD = "*",
-};
+export type StrokeValid = Stroke.POSITIVE_DIAGONAL | Stroke.NEGATIVE_DIAGONAL | Stroke.VERTICAL | Stroke.HORIZONTAL | Stroke.COMPOUND;
+export type StrokeEmptyable = StrokeValid | Stroke.EMPTY;
+export type StrokeWildcardable = StrokeValid | Stroke.WILDCARD;
