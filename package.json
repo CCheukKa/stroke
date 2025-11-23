@@ -1,7 +1,6 @@
 {
     "name": "g6",
     "private": true,
-    "type": "module",
     "scripts": {
         "dev": "(rm -r out/dev || true) && next dev --turbopack",
         "build": "(rm -r out || true) && next build --turbopack",
