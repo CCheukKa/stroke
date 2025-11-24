@@ -373,7 +373,10 @@ export default function HomePage() {
 
     function InputWindow() {
         return (
-            <div tabIndex={0} className={styles.inputWindow}>
+            <div className={[
+                styles.inputWindow,
+                state === State.DISABLED ? styles.inputWindowDisabled : "",
+            ].filter(Boolean).join(" ")}>
                 <div className={styles.queryStrokes}>
                     {queryStrokes !== "" ? queryStrokes : ghostQueryStrokes}
                 </div>
