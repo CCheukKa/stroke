@@ -10,7 +10,6 @@ export default function HomePage() {
     const enum State {
         DISABLED = "disabled",
         TYPING = "typing",
-        SUGGESTING = "suggesting",
         SELECTING = "selecting",
     };
     const [state, setState] = useState<State>(State.TYPING);
@@ -120,7 +119,6 @@ export default function HomePage() {
                     }
                 }
             }
-            case State.SUGGESTING:
             case State.TYPING: {
                 switch (code) {
                     case Keybinds.TOGGLE_ENABLE: {
