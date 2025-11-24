@@ -4,6 +4,7 @@ import { AppPageProps } from "./_app";
 import { useEffect } from "react";
 import { InputProvider, useInput } from "@/context/InputContext";
 import InputWindow from "@/components/InputWindow";
+import KeybindsInfo from "@/components/KeybindsInfo";
 
 function HomePageContent() {
     const { textAreaRef, handleInput } = useInput();
@@ -41,6 +42,7 @@ function HomePageContent() {
                 onKeyDown={handleInput}
             />
             <InputWindow />
+            <KeybindsInfo />
         </div>
     );
 }

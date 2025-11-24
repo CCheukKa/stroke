@@ -1,4 +1,4 @@
-import styles from "@/styles/index.module.css";
+import styles from "@/components/InputWindow.module.css";
 import { useInput, State } from "@/context/InputContext";
 
 export default function InputWindow() {
