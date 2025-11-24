@@ -16,20 +16,20 @@ function getCompiledRegex(query: string): RegExp {
     return regex;
 }
 
-const queryResultCache = new Map<RegExp, G6TCFEntry[]>();
-function getCachedQueryResult(regex: RegExp): G6TCFEntry[] {
-    if (queryResultCache.has(regex)) { return queryResultCache.get(regex)!; }
+const characterQueryResultCache = new Map<RegExp, G6TCFEntry[]>();
+function getCachedCharacterQueryResult(regex: RegExp): G6TCFEntry[] {
+    if (characterQueryResultCache.has(regex)) { return characterQueryResultCache.get(regex)!; }
     const result = G6TCFEntries.filter(entry => regex.test(entry.strokes));
-    queryResultCache.set(regex, result);
+    characterQueryResultCache.set(regex, result);
     return result;
 }
 
-type QueryResult = {
+type CharacterQueryResult = {
     results: G6TCFEntry[];
     timeTakenMs: number;
 };
-export function queryCharacters(query: string): QueryResult {
-    if (query === "") {
+export function queryCharactersFromStroke(strokeQuery: string): CharacterQueryResult {
+    if (strokeQuery === "") {
         return {
             results: [],
             timeTakenMs: 0,
@@ -37,8 +37,8 @@ export function queryCharacters(query: string): QueryResult {
     }
 
     const start = performance.now();
-    const regex = getCompiledRegex(query);
-    const searchResults = getCachedQueryResult(regex);
+    const regex = getCompiledRegex(strokeQuery);
+    const searchResults = getCachedCharacterQueryResult(regex);
     const end = performance.now();
     return {
         results: searchResults,
@@ -52,18 +52,42 @@ type SuggestionQueryResult = {
     suggestions: G6ADBSuggestions;
     timeTakenMs: number;
 };
-export function querySuggestions(character: string): SuggestionQueryResult {
-    if (character === "") {
+export function querySuggestionsFromCharacter(characterQuery: string): SuggestionQueryResult {
+    if (characterQuery === "") {
         return {
             suggestions: [],
             timeTakenMs: 0,
         };
     }
     const start = performance.now();
-    const suggestions = G6ADBMap.get(character) ?? [];
+    const suggestions = G6ADBMap.get(characterQuery) ?? [];
     const end = performance.now();
     return {
         suggestions: suggestions,
+        timeTakenMs: end - start,
+    };
+}
+
+/* -------------------------------------------------------------------------- */
+
+//? Cache this maybe?
+
+type StrokesQueryResult = {
+    stroke: string;
+    timeTakenMs: number;
+};
+export function queryStrokesFromCharacter(characterQuery: string): StrokesQueryResult {
+    if (characterQuery === "") {
+        return {
+            stroke: "",
+            timeTakenMs: 0,
+        };
+    }
+    const start = performance.now();
+    const entry = G6TCFEntries.find(entry => entry.character === characterQuery);
+    const end = performance.now();
+    return {
+        stroke: entry ? entry.strokes : "",
         timeTakenMs: end - start,
     };
 }

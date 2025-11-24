@@ -4,7 +4,7 @@ import { AppPageProps } from "./_app";
 import { useEffect, useRef, useState } from "react";
 import { Stroke, StrokeWildcardable } from "@/library/Stroke";
 import { G6ADBSuggestions, G6TCFEntry } from "@/library/jsoniseData";
-import { queryCharacters, querySuggestions } from "@/library/query";
+import { queryCharactersFromStroke, queryStrokesFromCharacter, querySuggestionsFromCharacter } from "@/library/query";
 
 export default function HomePage() {
     const enum State {
@@ -233,13 +233,13 @@ export default function HomePage() {
     let isSuggesting = false;
     function selectionIsValid(index: number): boolean {
         const globalIndex = selectionPage * 10 + index;
-        if (queryResults.length !== 0) {
+        if (characterQueryResults.length !== 0) {
             isSuggesting = false;
-            return globalIndex < queryResults.length;
+            return globalIndex < characterQueryResults.length;
         }
-        if (queryResults.length === 0 && suggestionResults.length !== 0) {
+        if (characterQueryResults.length === 0 && suggestionQueryResults.length !== 0) {
             isSuggesting = true;
-            return globalIndex < suggestionResults.length;
+            return globalIndex < suggestionQueryResults.length;
         }
         isSuggesting = false;
         return false;
@@ -266,9 +266,9 @@ export default function HomePage() {
                 let newQueryStroke = queryStrokes + action.input;
                 setGhostQueryStrokes("");
                 setQueryStrokes(newQueryStroke);
-                handleQuery(newQueryStroke);
+                handleCharacterQueryFromStroke(newQueryStroke);
                 setSelectionPage(0);
-                setSuggestionResults([]);
+                setSuggestionQueryResults([]);
                 return;
             }
             case ActionType.DELETE_STROKE: {
@@ -277,23 +277,23 @@ export default function HomePage() {
                 let newQueryStroke = queryStrokes.slice(0, -1);
                 setGhostQueryStrokes("");
                 setQueryStrokes(newQueryStroke);
-                handleQuery(newQueryStroke);
+                handleCharacterQueryFromStroke(newQueryStroke);
                 setSelectionPage(0);
-                setSuggestionResults([]);
+                setSuggestionQueryResults([]);
                 return;
             }
             case ActionType.CLEAR_STROKE: {
                 event.preventDefault();
                 setGhostQueryStrokes("");
                 setQueryStrokes("");
-                setQueryResults([]);
+                setCharacterQueryResults([]);
                 setSelectionPage(0);
-                setSuggestionResults([]);
+                setSuggestionQueryResults([]);
                 return;
             }
             case ActionType.NEXT_SELECTION_PAGE: {
                 event.preventDefault();
-                setSelectionPage(Math.min(selectionPage + 1, Math.ceil(queryResults.length / 10)));
+                setSelectionPage(Math.min(selectionPage + 1, Math.ceil(characterQueryResults.length / 10)));
                 return;
             }
             case ActionType.PREVIOUS_SELECTION_PAGE: {
@@ -305,24 +305,25 @@ export default function HomePage() {
                 event.preventDefault();
                 if (!selectionIsValid(action.index)) { return; }
                 if (isSuggesting) {
-                    const suggestedCharacter = suggestionResults[selectionPage * 10 + action.index];
+                    const suggestedCharacter = suggestionQueryResults[selectionPage * 10 + action.index];
                     insertCharacterAtCursor(suggestedCharacter);
                     console.log(`Suggested character: ${suggestedCharacter}`);
-                    setGhostQueryStrokes(""); //!
+                    const lastCharacter = suggestedCharacter.slice(-1);
+                    setGhostQueryStrokes(queryStrokesFromCharacter(lastCharacter).stroke);
                     setQueryStrokes("");
-                    setQueryResults([]);
+                    setCharacterQueryResults([]);
                     setSelectionPage(0);
-                    handleSuggestionQuery(suggestedCharacter);
+                    handleSuggestionQueryFromCharacter(lastCharacter);
                 } else {
-                    const selectedEntry = queryResults[selectionPage * 10 + action.index];
+                    const selectedEntry = characterQueryResults[selectionPage * 10 + action.index];
                     const selectedCharacter = selectedEntry.character;
                     insertCharacterAtCursor(selectedCharacter);
                     console.log(`Selected character: ${selectedCharacter}`);
                     setGhostQueryStrokes(selectedEntry.strokes);
                     setQueryStrokes("");
-                    setQueryResults([]);
+                    setCharacterQueryResults([]);
                     setSelectionPage(0);
-                    handleSuggestionQuery(selectedCharacter);
+                    handleSuggestionQueryFromCharacter(selectedCharacter);
                 }
                 return;
             }
@@ -333,8 +334,8 @@ export default function HomePage() {
                 console.log(`Substituted character: ${substitutedCharacter}`);
                 setGhostQueryStrokes("");
                 setQueryStrokes("");
-                setQueryResults([]);
-                setSuggestionResults([]);
+                setCharacterQueryResults([]);
+                setSuggestionQueryResults([]);
                 setSelectionPage(0);
                 return;
             }
@@ -356,20 +357,20 @@ export default function HomePage() {
         }
     }
 
-    const [queryResults, setQueryResults] = useState<G6TCFEntry[]>([]);
-    function handleQuery(query: string) {
-        const { results, timeTakenMs } = queryCharacters(query);
-        console.log(`Query: ${query} => Found ${results.length} results in ${timeTakenMs} ms.`);
+    const [characterQueryResults, setCharacterQueryResults] = useState<G6TCFEntry[]>([]);
+    function handleCharacterQueryFromStroke(strokeQuery: string) {
+        const { results, timeTakenMs } = queryCharactersFromStroke(strokeQuery);
+        console.log(`Query: ${strokeQuery} => Found ${results.length} results in ${timeTakenMs} ms.`);
         console.log("Results:", results);
-        setQueryResults(results);
+        setCharacterQueryResults(results);
     }
 
-    const [suggestionResults, setSuggestionResults] = useState<G6ADBSuggestions>([]);
-    function handleSuggestionQuery(character: string) {
-        const { suggestions, timeTakenMs } = querySuggestions(character);
-        console.log(`Suggestion Query: ${character} => Found ${suggestions.length} results in ${timeTakenMs} ms.`);
+    const [suggestionQueryResults, setSuggestionQueryResults] = useState<G6ADBSuggestions>([]);
+    function handleSuggestionQueryFromCharacter(characterQuery: string) {
+        const { suggestions, timeTakenMs } = querySuggestionsFromCharacter(characterQuery);
+        console.log(`Suggestion Query: ${characterQuery} => Found ${suggestions.length} results in ${timeTakenMs} ms.`);
         console.log("Results:", suggestions);
-        setSuggestionResults(suggestions);
+        setSuggestionQueryResults(suggestions);
     }
 
     function InputWindow() {
@@ -379,8 +380,8 @@ export default function HomePage() {
                     {queryStrokes !== "" ? queryStrokes : ghostQueryStrokes}
                 </div>
                 <div className={styles.queryResults}>
-                    {queryResults.length !== 0
-                        ? queryResults
+                    {characterQueryResults.length !== 0
+                        ? characterQueryResults
                             .slice(selectionPage * 10, selectionPage * 10 + 9)
                             .map((entry, index) => (
                                 <div key={index} className={styles.resultRow}>
@@ -397,7 +398,7 @@ export default function HomePage() {
                                     </span>
                                 </div>
                             ))
-                        : suggestionResults
+                        : suggestionQueryResults
                             .slice(selectionPage * 10, selectionPage * 10 + 9)
                             .map((suggestion, index) => (
                                 <div key={index} className={styles.resultRow}>
