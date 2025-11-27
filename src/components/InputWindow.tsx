@@ -20,41 +20,23 @@ export default function InputWindow() {
                 {queryStrokes !== "" ? queryStrokes : ghostQueryStrokes}
             </div>
             <div className={styles.queryResults}>
-                {characterQueryResults.length !== 0
-                    ? characterQueryResults
-                        .slice(selectionPage * 9, selectionPage * 9 + 9)
-                        .map((entry, index) => (
-                            <div key={index} className={styles.resultRow}>
-                                <span
-                                    className={[
-                                        styles.resultIndex,
-                                        state !== State.SELECTING ? styles.resultIndexDisabled : "",
-                                    ].filter(Boolean).join(" ")}
-                                >
-                                    {`${index + 1}. `}
-                                </span>
-                                <span className={styles.resultCharacter}>
-                                    {entry.character}
-                                </span>
-                            </div>
-                        ))
-                    : suggestionQueryResults
-                        .slice(selectionPage * 9, selectionPage * 9 + 9)
-                        .map((suggestion, index) => (
-                            <div key={index} className={styles.resultRow}>
-                                <span
-                                    className={[
-                                        styles.resultIndex,
-                                        state !== State.SELECTING ? styles.resultIndexDisabled : "",
-                                    ].filter(Boolean).join(" ")}
-                                >
-                                    {`${index + 1}. `}
-                                </span>
-                                <span className={styles.resultCharacter}>
-                                    {suggestion}
-                                </span>
-                            </div>
-                        ))
+                {(characterQueryResults.length !== 0 ? characterQueryResults : suggestionQueryResults)
+                    .slice(selectionPage * 9, selectionPage * 9 + 9)
+                    .map((character, index) => (
+                        <div key={index} className={styles.resultRow}>
+                            <span
+                                className={[
+                                    styles.resultIndex,
+                                    state !== State.SELECTING ? styles.resultIndexDisabled : "",
+                                ].filter(Boolean).join(" ")}
+                            >
+                                {`${index + 1}. `}
+                            </span>
+                            <span className={styles.resultCharacter}>
+                                {character}
+                            </span>
+                        </div>
+                    ))
                 }
             </div>
         </div>

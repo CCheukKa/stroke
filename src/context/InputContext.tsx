@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useRef, ReactNode, useEffect } from "react";
 import { Stroke, StrokeWildcardable } from "@/library/Stroke";
-import { G6ADBSuggestions, G6TCFEntry } from "@/library/jsoniseData";
 import { queryCharactersFromStroke, queryStrokesFromCharacter, querySuggestionsFromCharacter } from "@/library/query";
 
 export enum State {
@@ -38,8 +37,8 @@ type InputContextValue = {
     state: State;
     queryStrokes: string;
     ghostQueryStrokes: string;
-    characterQueryResults: G6TCFEntry[];
-    suggestionQueryResults: G6ADBSuggestions;
+    characterQueryResults: string[];
+    suggestionQueryResults: string[];
     selectionPage: number;
     textAreaRef: React.RefObject<HTMLTextAreaElement | null>;
     handleInput: (event: React.KeyboardEvent) => void;
@@ -62,8 +61,8 @@ export function InputProvider({ children }: InputProviderProps) {
     const [selectionPage, setSelectionPage] = useState(0);
     const [queryStrokes, setQueryStrokes] = useState("");
     const [ghostQueryStrokes, setGhostQueryStrokes] = useState("");
-    const [characterQueryResults, setCharacterQueryResults] = useState<G6TCFEntry[]>([]);
-    const [suggestionQueryResults, setSuggestionQueryResults] = useState<G6ADBSuggestions>([]);
+    const [characterQueryResults, setCharacterQueryResults] = useState<string[]>([]);
+    const [suggestionQueryResults, setSuggestionQueryResults] = useState<string[]>([]);
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
     const [isSuggesting, setIsSuggesting] = useState(false);
@@ -83,7 +82,7 @@ export function InputProvider({ children }: InputProviderProps) {
     }
 
     function handleCharacterQueryFromStroke(strokeQuery: string) {
-        const { results, timeTakenMs } = queryCharactersFromStroke(strokeQuery);
+        const { characters: results, timeTakenMs } = queryCharactersFromStroke(strokeQuery);
         console.log(`Query: ${strokeQuery} => Found ${results.length} results in ${timeTakenMs} ms.`);
         console.log("Results:", results);
         setCharacterQueryResults(results);
@@ -331,17 +330,16 @@ export function InputProvider({ children }: InputProviderProps) {
                     insertCharacterAtCursor(suggestedCharacter);
                     console.log(`Suggested character: ${suggestedCharacter}`);
                     const lastCharacter = suggestedCharacter.slice(-1);
-                    setGhostQueryStrokes(queryStrokesFromCharacter(lastCharacter).stroke);
+                    setGhostQueryStrokes(queryStrokesFromCharacter(lastCharacter).strokes);
                     setQueryStrokes("");
                     setCharacterQueryResults([]);
                     setSelectionPage(0);
                     handleSuggestionQueryFromCharacter(lastCharacter);
                 } else {
-                    const selectedEntry = characterQueryResults[selectionPage * 9 + action.index];
-                    const selectedCharacter = selectedEntry.character;
+                    const selectedCharacter = characterQueryResults[selectionPage * 9 + action.index];
                     insertCharacterAtCursor(selectedCharacter);
                     console.log(`Selected character: ${selectedCharacter}`);
-                    setGhostQueryStrokes(selectedEntry.strokes);
+                    setGhostQueryStrokes(queryStrokesFromCharacter(selectedCharacter).strokes);
                     setQueryStrokes("");
                     setCharacterQueryResults([]);
                     setSelectionPage(0);
