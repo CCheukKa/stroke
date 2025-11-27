@@ -152,12 +152,8 @@ export class G6Compiler {
     public static async jsoniseSuggestions(variant: VARIANT = VARIANT.TRADITIONAL): Promise<SuggestionsResult> {
         const startTime = performance.now();
 
-        if (variant !== VARIANT.TRADITIONAL) {
-            // TODO: implement simplified variant
-            throw new Error("Only traditional variant is supported for G6 data.");
-        }
         const suggestionsData: CharacterSuggestionsData = {};
-        (this.getDatabaseTable("ADB") as G6ADBEntryRaw[])
+        (this.getDatabaseTable(variant === VARIANT.TRADITIONAL ? "ADB" : "SADB") as G6ADBEntryRaw[])
             .forEach(row => {
                 const suggestions: string[] = [];
                 for (let i = 0; i <= 62; i++) {
