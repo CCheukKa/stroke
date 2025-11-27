@@ -45,3 +45,4 @@ yarn-error.log*
 *.sqlite-wal
 *.sqlite-shm
 /public/strokeData.json
+/public/suggestionsData.json
