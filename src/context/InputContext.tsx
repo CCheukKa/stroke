@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useRef, ReactNode } from "react";
+import { createContext, useContext, useState, useRef, ReactNode, useEffect } from "react";
 import { Stroke, StrokeWildcardable } from "@/library/Stroke";
 import { G6ADBSuggestions, G6TCFEntry } from "@/library/jsoniseData";
 import { queryCharactersFromStroke, queryStrokesFromCharacter, querySuggestionsFromCharacter } from "@/library/query";
@@ -66,20 +66,20 @@ export function InputProvider({ children }: InputProviderProps) {
     const [suggestionQueryResults, setSuggestionQueryResults] = useState<G6ADBSuggestions>([]);
     const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
-    let isSuggesting = false;
+    const [isSuggesting, setIsSuggesting] = useState(false);
+    useEffect(() => {
+        setIsSuggesting(characterQueryResults.length === 0 && suggestionQueryResults.length !== 0);
+    }, [characterQueryResults, suggestionQueryResults]);
 
     function selectionIsValid(index: number): boolean {
-        const globalIndex = selectionPage * 10 + index;
-        if (characterQueryResults.length !== 0) {
-            isSuggesting = false;
-            return globalIndex < characterQueryResults.length;
+        if (characterQueryResults.length === 0 && suggestionQueryResults.length === 0) {
+            return false;
         }
-        if (characterQueryResults.length === 0 && suggestionQueryResults.length !== 0) {
-            isSuggesting = true;
-            return globalIndex < suggestionQueryResults.length;
-        }
-        isSuggesting = false;
-        return false;
+
+        const globalIndex = selectionPage * 9 + index;
+        return isSuggesting
+            ? globalIndex < suggestionQueryResults.length
+            : globalIndex < characterQueryResults.length;
     }
 
     function handleCharacterQueryFromStroke(strokeQuery: string) {
@@ -310,7 +310,11 @@ export function InputProvider({ children }: InputProviderProps) {
             }
             case ActionType.NEXT_SELECTION_PAGE: {
                 event.preventDefault();
-                setSelectionPage(Math.min(selectionPage + 1, Math.ceil(characterQueryResults.length / 10)));
+                if (isSuggesting) {
+                    setSelectionPage(Math.min(selectionPage + 1, Math.floor(suggestionQueryResults.length / 9)));
+                } else {
+                    setSelectionPage(Math.min(selectionPage + 1, Math.floor(characterQueryResults.length / 9)));
+                }
                 return;
             }
             case ActionType.PREVIOUS_SELECTION_PAGE: {
@@ -321,8 +325,9 @@ export function InputProvider({ children }: InputProviderProps) {
             case ActionType.SELECT_CHARACTER: {
                 event.preventDefault();
                 if (!selectionIsValid(action.index)) { return; }
+
                 if (isSuggesting) {
-                    const suggestedCharacter = suggestionQueryResults[selectionPage * 10 + action.index];
+                    const suggestedCharacter = suggestionQueryResults[selectionPage * 9 + action.index];
                     insertCharacterAtCursor(suggestedCharacter);
                     console.log(`Suggested character: ${suggestedCharacter}`);
                     const lastCharacter = suggestedCharacter.slice(-1);
@@ -332,7 +337,7 @@ export function InputProvider({ children }: InputProviderProps) {
                     setSelectionPage(0);
                     handleSuggestionQueryFromCharacter(lastCharacter);
                 } else {
-                    const selectedEntry = characterQueryResults[selectionPage * 10 + action.index];
+                    const selectedEntry = characterQueryResults[selectionPage * 9 + action.index];
                     const selectedCharacter = selectedEntry.character;
                     insertCharacterAtCursor(selectedCharacter);
                     console.log(`Selected character: ${selectedCharacter}`);

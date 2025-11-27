@@ -22,7 +22,7 @@ export default function InputWindow() {
             <div className={styles.queryResults}>
                 {characterQueryResults.length !== 0
                     ? characterQueryResults
-                        .slice(selectionPage * 10, selectionPage * 10 + 9)
+                        .slice(selectionPage * 9, selectionPage * 9 + 9)
                         .map((entry, index) => (
                             <div key={index} className={styles.resultRow}>
                                 <span
@@ -39,7 +39,7 @@ export default function InputWindow() {
                             </div>
                         ))
                     : suggestionQueryResults
-                        .slice(selectionPage * 10, selectionPage * 10 + 9)
+                        .slice(selectionPage * 9, selectionPage * 9 + 9)
                         .map((suggestion, index) => (
                             <div key={index} className={styles.resultRow}>
                                 <span
