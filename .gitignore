@@ -46,3 +46,5 @@ yarn-error.log*
 /public/g6-adb-entries.json
 *.sqlite-shm
 *.sqlite-wal
+/data
+/public/cns-unicode-to-strokes.json
