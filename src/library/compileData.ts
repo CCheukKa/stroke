@@ -5,6 +5,7 @@ import { StrokeInputDataCompiler } from "./StrokeInputDataCompiler";
 import { G6Compiler } from "./G6Compiler";
 
 const outputDir = "public";
+fs.ensureDirSync(outputDir);
 
 /* -------------------------------------------------------------------------- */
 
