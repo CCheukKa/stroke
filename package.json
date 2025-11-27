@@ -4,7 +4,7 @@
     "scripts": {
         "dev": "(rm -r out/dev || true) && next dev --turbopack",
         "build": "(rm -r out || true) && next build --turbopack",
-        "build-database": "node --experimental-transform-types ./src/library/jsoniseData.ts"
+        "build-database": "mkdir public && node --experimental-transform-types ./src/library/jsoniseData.ts"
     },
     "dependencies": {
         "next": "16.0.1",
