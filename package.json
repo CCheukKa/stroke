@@ -4,22 +4,20 @@
     "scripts": {
         "dev": "(rm -r out/dev || true) && next dev --turbopack",
         "build": "(rm -r out || true) && next build --turbopack",
-        "build-database": "(mkdir public || true) && node --experimental-transform-types ./src/library/jsoniseData.ts"
+        "compile": "(mkdir public || true) && bun run src/library/compileData.ts"
     },
     "dependencies": {
+        "fs-extra": "^11.3.2",
         "next": "16.0.1",
         "react": "^19",
-        "react-dom": "^19",
-        "better-sqlite3": "^12.4.5",
-        "fs-extra": "^11.3.2"
+        "react-dom": "^19"
     },
     "devDependencies": {
+        "@types/bun": "latest",
+        "@types/fs-extra": "^11.0.4",
         "@types/react": "^19",
         "@types/react-dom": "^19",
         "babel-plugin-react-compiler": "^1.0.0",
-        "@types/bun": "latest",
-        "@types/better-sqlite3": "^7.6.13",
-        "@types/fs-extra": "^11.0.4",
         "typescript": "^5"
     }
 }

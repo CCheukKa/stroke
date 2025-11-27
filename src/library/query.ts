@@ -1,8 +1,8 @@
 import characterStrokeJson from '../../public/strokeData.json';
 import characterSuggestionsJson from '../../public/suggestionsData.json';
 import { Stroke } from './Stroke';
-import { CharacterStrokeData, CharacterSuggestionsData } from './compileData';
-const characterStrokeData = characterStrokeJson as CharacterStrokeData[];
+import { CharacterStrokeDataEntry, CharacterSuggestionsData } from './compileData';
+const characterStrokeData = characterStrokeJson as CharacterStrokeDataEntry[];
 const characterSuggestionsData = characterSuggestionsJson as CharacterSuggestionsData;
 
 /* -------------------------------------------------------------------------- */

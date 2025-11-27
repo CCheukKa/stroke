@@ -42,3 +42,6 @@ yarn-error.log*
 # custom
 **/.vscode
 /next-env.d.ts
+*.sqlite-wal
+*.sqlite-shm
+/public/strokeData.json
