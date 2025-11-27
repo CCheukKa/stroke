@@ -2,7 +2,7 @@ import fs from "fs-extra";
 import path from "path";
 import { Stroke } from "./Stroke";
 
-const baseDataDir = "stroke-input-data";
+const baseDataDir = "data/stroke-input-data";
 const outputDir = "public";
 
 /* -------------------------------------------------------------------------- */
