@@ -1,21 +1,5 @@
-# bun-react-template
+This is an archive of the G6 project, which has been deprecated and is no longer maintained.  
+The original website can be found [here](http://www.miniapps.hk/g6code/).  
+The custom directory contains my own customisations and addition to the original G6 sqlite dictionary database.  
 
-To install dependencies:
-
-```bash
-bun install
-```
-
-To start a development server:
-
-```bash
-bun dev
-```
-
-To run for production:
-
-```bash
-bun start
-```
-
-This project was created using `bun init` in bun v1.3.0. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+This repository is currently extended to also host a web rewrite of G6.  
