@@ -1,0 +1,3 @@
+[submodule "stroke-input-data"]
+	path = stroke-input-data
+	url = https://github.com/stroke-input/stroke-input-data.git

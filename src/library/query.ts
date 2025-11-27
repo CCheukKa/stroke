@@ -1,10 +1,9 @@
-import type { G6ADBEntry, G6ADBSuggestions, G6TCFEntry } from './jsoniseData';
-import G6TCFJson from '../../public/g6-tcf-entries.json';
-import G6ADBJson from '../../public/g6-adb-entries.json';
+import characterStrokeJson from '../../public/strokeData.json';
+import characterSuggestionsJson from '../../public/suggestionsData.json';
 import { Stroke } from './Stroke';
-const G6TCFEntries = G6TCFJson as G6TCFEntry[];
-const G6ADBMap = new Map<string, G6ADBSuggestions>();
-for (const entry of G6ADBJson as G6ADBEntry[]) { G6ADBMap.set(entry.character, entry.suggestions); }
+import { CharacterStrokeData, CharacterSuggestionsData } from './compileData';
+const characterStrokeData = characterStrokeJson as CharacterStrokeData[];
+const characterSuggestionsData = characterSuggestionsJson as CharacterSuggestionsData;
 
 /* -------------------------------------------------------------------------- */
 
@@ -16,32 +15,32 @@ function getCompiledRegex(query: string): RegExp {
     return regex;
 }
 
-const characterQueryResultCache = new Map<RegExp, G6TCFEntry[]>();
-function getCachedCharacterQueryResult(regex: RegExp): G6TCFEntry[] {
+const characterQueryResultCache = new Map<RegExp, string[]>();
+function getCachedCharacterQueryResult(regex: RegExp): string[] {
     if (characterQueryResultCache.has(regex)) { return characterQueryResultCache.get(regex)!; }
-    const result = G6TCFEntries.filter(entry => regex.test(entry.strokes));
-    characterQueryResultCache.set(regex, result);
-    return result;
+    const queryResult = characterStrokeData.filter(entry => entry.strokeSequences.some(sequence => regex.test(sequence))).map(entry => entry.character);
+    characterQueryResultCache.set(regex, queryResult);
+    return queryResult;
 }
 
 type CharacterQueryResult = {
-    results: G6TCFEntry[];
+    characters: string[];
     timeTakenMs: number;
 };
 export function queryCharactersFromStroke(strokeQuery: string): CharacterQueryResult {
     if (strokeQuery === "") {
         return {
-            results: [],
+            characters: [],
             timeTakenMs: 0,
         };
     }
 
     const start = performance.now();
     const regex = getCompiledRegex(strokeQuery);
-    const searchResults = getCachedCharacterQueryResult(regex);
+    const characters = getCachedCharacterQueryResult(regex);
     const end = performance.now();
     return {
-        results: searchResults,
+        characters,
         timeTakenMs: end - start,
     };
 }
@@ -49,7 +48,7 @@ export function queryCharactersFromStroke(strokeQuery: string): CharacterQueryRe
 /* -------------------------------------------------------------------------- */
 
 type SuggestionQueryResult = {
-    suggestions: G6ADBSuggestions;
+    suggestions: string[];
     timeTakenMs: number;
 };
 export function querySuggestionsFromCharacter(characterQuery: string): SuggestionQueryResult {
@@ -60,7 +59,7 @@ export function querySuggestionsFromCharacter(characterQuery: string): Suggestio
         };
     }
     const start = performance.now();
-    const suggestions = G6ADBMap.get(characterQuery) ?? [];
+    const suggestions = characterSuggestionsData[characterQuery] || [];
     const end = performance.now();
     return {
         suggestions: suggestions,
@@ -71,23 +70,25 @@ export function querySuggestionsFromCharacter(characterQuery: string): Suggestio
 /* -------------------------------------------------------------------------- */
 
 //? Cache this maybe?
-
 type StrokesQueryResult = {
-    stroke: string;
+    strokes: string;
     timeTakenMs: number;
 };
 export function queryStrokesFromCharacter(characterQuery: string): StrokesQueryResult {
     if (characterQuery === "") {
         return {
-            stroke: "",
+            strokes: "",
             timeTakenMs: 0,
         };
     }
     const start = performance.now();
-    const entry = G6TCFEntries.find(entry => entry.character === characterQuery);
+    const entry = characterStrokeData.find(entry => entry.character === characterQuery);
     const end = performance.now();
+
+    // TODO: set a canonical stroke sequence instead of a random one
+    const strokes = entry ? entry.strokeSequences[Math.floor(Math.random() * entry.strokeSequences.length)] : "";
     return {
-        stroke: entry ? entry.strokes : "",
+        strokes,
         timeTakenMs: end - start,
     };
 }

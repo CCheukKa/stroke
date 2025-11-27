@@ -42,7 +42,3 @@ yarn-error.log*
 # custom
 **/.vscode
 /next-env.d.ts
-/public/g6-tcf-entries.json
-/public/g6-adb-entries.json
-*.sqlite-shm
-*.sqlite-wal
