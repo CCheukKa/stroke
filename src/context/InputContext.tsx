@@ -111,29 +111,31 @@ export function InputProvider({ children }: InputProviderProps) {
         console.log(`State Machine: Current State = ${state}, Key = ${code} (${key})`);
 
         const Keybinds = {
-            TOGGLE_ENABLE: "AltLeft",
-            STORKE_NEGATIVE_DIAGONAL: "Numpad4",
-            STORKE_COMPOUND: "Numpad5",
-            STORKE_WILDCARD: "Numpad6",
-            STORKE_HORIZONTAL: "Numpad7",
-            STORKE_VERTICAL: "Numpad8",
-            STORKE_POSITIVE_DIAGONAL: "Numpad9",
-            DELETE: "Backspace",
-            CLEAR: "Escape",
-            TOGGLE_SELECT: "Numpad0",
-            NEXT_PAGE: "NumpadAdd",
-            PREVIOUS_PAGE: "NumpadSubtract",
-            SELECT_FIRST: "NumpadEnter",
-            SELECT_1: "Numpad1",
-            SELECT_2: "Numpad2",
-            SELECT_3: "Numpad3",
-            SELECT_4: "Numpad4",
-            SELECT_5: "Numpad5",
-            SELECT_6: "Numpad6",
-            SELECT_7: "Numpad7",
-            SELECT_8: "Numpad8",
-            SELECT_9: "Numpad9",
+            TOGGLE_ENABLE: ["AltLeft"],
+            STORKE_NEGATIVE_DIAGONAL: ["Numpad4", "KeyJ"],
+            STORKE_COMPOUND: ["Numpad5", "KeyK"],
+            STORKE_WILDCARD: ["Numpad6", "KeyL"],
+            STORKE_HORIZONTAL: ["Numpad7", "KeyU"],
+            STORKE_VERTICAL: ["Numpad8", "KeyI"],
+            STORKE_POSITIVE_DIAGONAL: ["Numpad9", "KeyO"],
+            DELETE: ["Backspace"],
+            CLEAR: ["Escape"],
+            TOGGLE_SELECT: ["Numpad0", "Digit0"],
+            NEXT_PAGE: ["NumpadAdd", "KeyM"],
+            PREVIOUS_PAGE: ["NumpadSubtract", "KeyN"],
+            SELECT_FIRST: ["NumpadEnter"],
+            SELECT_1: ["Numpad1", "Digit1"],
+            SELECT_2: ["Numpad2", "Digit2"],
+            SELECT_3: ["Numpad3", "Digit3"],
+            SELECT_4: ["Numpad4", "Digit4"],
+            SELECT_5: ["Numpad5", "Digit5"],
+            SELECT_6: ["Numpad6", "Digit6"],
+            SELECT_7: ["Numpad7", "Digit7"],
+            SELECT_8: ["Numpad8", "Digit8"],
+            SELECT_9: ["Numpad9", "Digit9"],
         } as const;
+
+        const is = (keybind: readonly string[]) => keybind.includes(code);
 
         const substitutableCharacters: Map<string, string> = new Map([
             ["~", "～"], ["!", "！"], ["@", "＠"], ["#", "＃"],
@@ -148,39 +150,33 @@ export function InputProvider({ children }: InputProviderProps) {
 
         switch (state) {
             case State.DISABLED: {
-                switch (code) {
-                    case Keybinds.TOGGLE_ENABLE: {
-                        setState(State.TYPING);
-                        return { type: ActionType.CLEAR_STROKE };
-                    }
-                    default: {
-                        return { type: ActionType.NOOP };
-                    }
+                if (is(Keybinds.TOGGLE_ENABLE)) {
+                    setState(State.TYPING);
+                    return { type: ActionType.CLEAR_STROKE };
                 }
+                return { type: ActionType.NOOP };
             }
             case State.TYPING: {
-                switch (code) {
-                    case Keybinds.TOGGLE_ENABLE: {
-                        setState(State.DISABLED);
-                        return { type: ActionType.CLEAR_STROKE };
-                    }
-                    case Keybinds.STORKE_POSITIVE_DIAGONAL: { return { type: ActionType.ADD_STROKE, input: Stroke.POSITIVE_DIAGONAL }; }
-                    case Keybinds.STORKE_NEGATIVE_DIAGONAL: { return { type: ActionType.ADD_STROKE, input: Stroke.NEGATIVE_DIAGONAL }; }
-                    case Keybinds.STORKE_VERTICAL: { return { type: ActionType.ADD_STROKE, input: Stroke.VERTICAL }; }
-                    case Keybinds.STORKE_HORIZONTAL: { return { type: ActionType.ADD_STROKE, input: Stroke.HORIZONTAL }; }
-                    case Keybinds.STORKE_COMPOUND: { return { type: ActionType.ADD_STROKE, input: Stroke.COMPOUND }; }
-                    case Keybinds.STORKE_WILDCARD: { return { type: ActionType.ADD_STROKE, input: Stroke.WILDCARD }; }
-                    case Keybinds.DELETE: { return { type: ActionType.DELETE_STROKE }; }
-                    case Keybinds.CLEAR: { return { type: ActionType.CLEAR_STROKE }; }
-                    case Keybinds.SELECT_FIRST: {
-                        if (!selectionIsValid(0)) { return { type: ActionType.NOOP }; }
-                        setState(State.TYPING);
-                        return { type: ActionType.SELECT_CHARACTER, index: 0 };
-                    }
-                    case Keybinds.TOGGLE_SELECT: {
-                        setState(State.SELECTING);
-                        return { type: ActionType.CONSUME_KEYPRESS };
-                    }
+                if (is(Keybinds.TOGGLE_ENABLE)) {
+                    setState(State.DISABLED);
+                    return { type: ActionType.CLEAR_STROKE };
+                }
+                if (is(Keybinds.STORKE_POSITIVE_DIAGONAL)) { return { type: ActionType.ADD_STROKE, input: Stroke.POSITIVE_DIAGONAL }; }
+                if (is(Keybinds.STORKE_NEGATIVE_DIAGONAL)) { return { type: ActionType.ADD_STROKE, input: Stroke.NEGATIVE_DIAGONAL }; }
+                if (is(Keybinds.STORKE_VERTICAL)) { return { type: ActionType.ADD_STROKE, input: Stroke.VERTICAL }; }
+                if (is(Keybinds.STORKE_HORIZONTAL)) { return { type: ActionType.ADD_STROKE, input: Stroke.HORIZONTAL }; }
+                if (is(Keybinds.STORKE_COMPOUND)) { return { type: ActionType.ADD_STROKE, input: Stroke.COMPOUND }; }
+                if (is(Keybinds.STORKE_WILDCARD)) { return { type: ActionType.ADD_STROKE, input: Stroke.WILDCARD }; }
+                if (is(Keybinds.DELETE)) { return { type: ActionType.DELETE_STROKE }; }
+                if (is(Keybinds.CLEAR)) { return { type: ActionType.CLEAR_STROKE }; }
+                if (is(Keybinds.SELECT_FIRST)) {
+                    if (!selectionIsValid(0)) { return { type: ActionType.NOOP }; }
+                    setState(State.TYPING);
+                    return { type: ActionType.SELECT_CHARACTER, index: 0 };
+                }
+                if (is(Keybinds.TOGGLE_SELECT)) {
+                    setState(State.SELECTING);
+                    return { type: ActionType.CONSUME_KEYPRESS };
                 }
                 if (substitutableCharacters.has(key)) {
                     const character = substitutableCharacters.get(key)!;
@@ -189,75 +185,70 @@ export function InputProvider({ children }: InputProviderProps) {
                 return { type: ActionType.NOOP };
             }
             case State.SELECTING: {
-                switch (code) {
-                    case Keybinds.TOGGLE_ENABLE: {
-                        setState(State.DISABLED);
-                        return { type: ActionType.CLEAR_STROKE };
-                    }
-                    case Keybinds.CLEAR: {
-                        setState(State.TYPING);
-                        return { type: ActionType.CLEAR_STROKE };
-                    }
-                    case Keybinds.TOGGLE_SELECT: {
-                        setState(State.TYPING);
-                        return { type: ActionType.CONSUME_KEYPRESS };
-                    }
-                    case Keybinds.DELETE: {
-                        setState(State.TYPING);
-                        return { type: ActionType.DELETE_STROKE };
-                    }
-                    case Keybinds.NEXT_PAGE: { return { type: ActionType.NEXT_SELECTION_PAGE }; }
-                    case Keybinds.PREVIOUS_PAGE: { return { type: ActionType.PREVIOUS_SELECTION_PAGE }; }
-                    case Keybinds.SELECT_FIRST:
-                    case Keybinds.SELECT_1: {
-                        if (!selectionIsValid(0)) { return { type: ActionType.NOOP }; }
-                        setState(State.TYPING);
-                        return { type: ActionType.SELECT_CHARACTER, index: 0 };
-                    }
-                    case Keybinds.SELECT_2: {
-                        if (!selectionIsValid(1)) { return { type: ActionType.NOOP }; }
-                        setState(State.TYPING);
-                        return { type: ActionType.SELECT_CHARACTER, index: 1 };
-                    }
-                    case Keybinds.SELECT_3: {
-                        if (!selectionIsValid(2)) { return { type: ActionType.NOOP }; }
-                        setState(State.TYPING);
-                        return { type: ActionType.SELECT_CHARACTER, index: 2 };
-                    }
-                    case Keybinds.SELECT_4: {
-                        if (!selectionIsValid(3)) { return { type: ActionType.NOOP }; }
-                        setState(State.TYPING);
-                        return { type: ActionType.SELECT_CHARACTER, index: 3 };
-                    }
-                    case Keybinds.SELECT_5: {
-                        if (!selectionIsValid(4)) { return { type: ActionType.NOOP }; }
-                        setState(State.TYPING);
-                        return { type: ActionType.SELECT_CHARACTER, index: 4 };
-                    }
-                    case Keybinds.SELECT_6: {
-                        if (!selectionIsValid(5)) { return { type: ActionType.NOOP }; }
-                        setState(State.TYPING);
-                        return { type: ActionType.SELECT_CHARACTER, index: 5 };
-                    }
-                    case Keybinds.SELECT_7: {
-                        if (!selectionIsValid(6)) { return { type: ActionType.NOOP }; }
-                        setState(State.TYPING);
-                        return { type: ActionType.SELECT_CHARACTER, index: 6 };
-                    }
-                    case Keybinds.SELECT_8: {
-                        if (!selectionIsValid(7)) { return { type: ActionType.NOOP }; }
-                        setState(State.TYPING);
-                        return { type: ActionType.SELECT_CHARACTER, index: 7 };
-                    }
-                    case Keybinds.SELECT_9: {
-                        if (!selectionIsValid(8)) { return { type: ActionType.NOOP }; }
-                        setState(State.TYPING);
-                        return { type: ActionType.SELECT_CHARACTER, index: 8 };
-                    }
-                    default: {
-                        return { type: ActionType.NOOP };
-                    }
+                if (is(Keybinds.TOGGLE_ENABLE)) {
+                    setState(State.DISABLED);
+                    return { type: ActionType.CLEAR_STROKE };
                 }
+                if (is(Keybinds.CLEAR)) {
+                    setState(State.TYPING);
+                    return { type: ActionType.CLEAR_STROKE };
+                }
+                if (is(Keybinds.TOGGLE_SELECT)) {
+                    setState(State.TYPING);
+                    return { type: ActionType.CONSUME_KEYPRESS };
+                }
+                if (is(Keybinds.DELETE)) {
+                    setState(State.TYPING);
+                    return { type: ActionType.DELETE_STROKE };
+                }
+                if (is(Keybinds.NEXT_PAGE)) { return { type: ActionType.NEXT_SELECTION_PAGE }; }
+                if (is(Keybinds.PREVIOUS_PAGE)) { return { type: ActionType.PREVIOUS_SELECTION_PAGE }; }
+                if (is(Keybinds.SELECT_FIRST) || is(Keybinds.SELECT_1)) {
+                    if (!selectionIsValid(0)) { return { type: ActionType.NOOP }; }
+                    setState(State.TYPING);
+                    return { type: ActionType.SELECT_CHARACTER, index: 0 };
+                }
+                if (is(Keybinds.SELECT_2)) {
+                    if (!selectionIsValid(1)) { return { type: ActionType.NOOP }; }
+                    setState(State.TYPING);
+                    return { type: ActionType.SELECT_CHARACTER, index: 1 };
+                }
+                if (is(Keybinds.SELECT_3)) {
+                    if (!selectionIsValid(2)) { return { type: ActionType.NOOP }; }
+                    setState(State.TYPING);
+                    return { type: ActionType.SELECT_CHARACTER, index: 2 };
+                }
+                if (is(Keybinds.SELECT_4)) {
+                    if (!selectionIsValid(3)) { return { type: ActionType.NOOP }; }
+                    setState(State.TYPING);
+                    return { type: ActionType.SELECT_CHARACTER, index: 3 };
+                }
+                if (is(Keybinds.SELECT_5)) {
+                    if (!selectionIsValid(4)) { return { type: ActionType.NOOP }; }
+                    setState(State.TYPING);
+                    return { type: ActionType.SELECT_CHARACTER, index: 4 };
+                }
+                if (is(Keybinds.SELECT_6)) {
+                    if (!selectionIsValid(5)) { return { type: ActionType.NOOP }; }
+                    setState(State.TYPING);
+                    return { type: ActionType.SELECT_CHARACTER, index: 5 };
+                }
+                if (is(Keybinds.SELECT_7)) {
+                    if (!selectionIsValid(6)) { return { type: ActionType.NOOP }; }
+                    setState(State.TYPING);
+                    return { type: ActionType.SELECT_CHARACTER, index: 6 };
+                }
+                if (is(Keybinds.SELECT_8)) {
+                    if (!selectionIsValid(7)) { return { type: ActionType.NOOP }; }
+                    setState(State.TYPING);
+                    return { type: ActionType.SELECT_CHARACTER, index: 7 };
+                }
+                if (is(Keybinds.SELECT_9)) {
+                    if (!selectionIsValid(8)) { return { type: ActionType.NOOP }; }
+                    setState(State.TYPING);
+                    return { type: ActionType.SELECT_CHARACTER, index: 8 };
+                }
+                return { type: ActionType.NOOP };
             }
         }
 
